@@ -9,6 +9,5 @@ chatterbot = ChatBot("Sayori")
 chatterbot.set_trainer(ChatterBotCorpusTrainer)
 
 chatterbot.train(
-    "chatterbot.corpus.english",
-
+    "chatterbot.corpus.english"
 )

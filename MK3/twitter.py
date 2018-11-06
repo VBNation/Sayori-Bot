@@ -20,7 +20,7 @@ TWITTER = {
 '''
 
 # Comment out the following line to disable verbose logging
-#logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 chatbot = ChatBot(
     "Sayori",

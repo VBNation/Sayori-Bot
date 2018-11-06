@@ -15,7 +15,7 @@ bot = ChatBot(
         "chatterbot.logic.BestMatch",
         {
             'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.90,
+            'threshold': 0.80,
             'default_response': 'I am sorry, but I do not understand.'
         },
         "chatterbot.logic.MathematicalEvaluation",
@@ -24,7 +24,7 @@ bot = ChatBot(
     ],
     input_adapter="chatterbot.input.TerminalAdapter",
     output_adapter="chatterbot.output.TerminalAdapter",
-    database="D:\AI R+D\Sayori Bot\MK3\db.sqlite3"
+    database="db.sqlite3"
 )
 
 print("Type something to begin...")
