@@ -5,7 +5,7 @@ import youtube_dl
 
 from chatterbot import ChatBot
 
-TOKEN = 'NDQzNDk0MTc2MTM1NTc3NjMw.DnzM6w.EaLd-H0JW1KjgmJt6tbcSyofv-U'
+TOKEN = ''
 
 client = discord.Client()
 chatbot = ChatBot(

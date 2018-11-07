@@ -1,30 +1,14 @@
 import os
 
 from chatterbot import ChatBot
-import logging
-logging.basicConfig(level=logging.INFO)
-
 
 # configure how the bot train and retrieve responses
 chatbot = ChatBot(
     'Sayori',
     trainer='chatterbot.trainers.ListTrainer',
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
-	filters=["chatterbot.filters.RepetitiveResponseFilter"],
-	preprocessors=[
-        'chatterbot.preprocessors.clean_whitespace',
-		'chatterbot.preprocessors.unescape_html',
-		'chatterbot.preprocessors.convert_to_ascii',
-    ],
 	logic_adapters=[
         'chatterbot.logic.BestMatch',
-		
-		{
-            'import_path': 'chatterbot.logic.LowConfidenceAdapter',
-            'threshold': 0.35,
-            'default_response': 'I am sorry, but I do not understand.'
-        },
-		
 		"chatterbot.logic.MathematicalEvaluation",
         #"chatterbot.logic.TimeLogicAdapter",
     ],

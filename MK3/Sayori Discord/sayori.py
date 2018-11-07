@@ -1,17 +1,24 @@
 import asyncio
+from features import *
 from concurrent.futures import ProcessPoolExecutor
 import os
 import sys
+import unicodedata
+import requests
+from gtts import gTTS
+import youtube_dl
 
 import discord
 
-from config import chatbot, PROCESS_POOL_EXECUTOR_COUNT, WAIT_TIME_BEFORE_TYPING, WAIT_TIME_RESPONSE_READY
+from config import chatbot, PROCESS_POOL_EXECUTOR_COUNT, WAIT_TIME_BEFORE_TYPING, WAIT_TIME_RESPONSE_READY, COMMANDPREFIX, BOTID
 
-
+#join server: https://discordapp.com/oauth2/authorize?&client_id=[ID]&scope=bot&permissions=70257664
 print("Starting process")
 client = discord.Client()
 ppool = ProcessPoolExecutor(PROCESS_POOL_EXECUTOR_COUNT)
 
+async def start(self):
+    discord.opus.load_opus(self.opus_library)
 
 @client.event
 async def on_ready():
@@ -27,7 +34,7 @@ def generate_response(message):
 
 
 async def reply_to_message(message):
-    print("Got:", message.content)
+    print("Got:", message.content.encode('utf-8'))
     msg = message.content.lower().replace(client.user.name.lower(), '').replace(client.user.mention, '')
     response_gen = asyncio.get_event_loop().run_in_executor(ppool, generate_response, msg)
     await asyncio.sleep(WAIT_TIME_BEFORE_TYPING)
@@ -44,10 +51,107 @@ async def reply_to_message(message):
     if filename and os.path.exists(os.path.join('images', filename)):
         with open(os.path.join('images', filename), 'rb') as f:
             await client.send_file(message.channel, f)
-
-
-@client.event
+#sayori tts
+    tts = gTTS(text=str(response),lang='en')
+    tts.save('msg.mp3')
+	
+    player = voice.create_ffmpeg_player('msg.mp3')
+    player.start()
+	
+@client.event		
 async def on_message(message):
+
+# If the message author isn't the bot and the message starts with the
+    # command prefix ('!' by default), check if command was executed
+    if message.author.id != '443494176135577630' and message.content.startswith('~'):
+        # Remove prefix and change to lowercase so commands aren't case-sensitive
+        message.content = message.content[1:].lower()
+
+        # Shuts the bot down - only usable by the bot owner specified in config
+        if message.content.startswith('goodnight') and message.author.id == '229662850799501313':
+            await client.send_message(message.channel, 'Shutting down. Goodnight!')
+            await client.logout()
+            await client.close()
+        ########## VOICE COMMANDS ##########
+
+        # Will join the voice channel of the message author if they're in a channel
+        # and the bot is not currently connected to a voice channel
+        elif message.content.startswith('join'):
+            if message.author.voice_channel != None and client.is_voice_connected(message.server) != True:
+                global currentChannel
+                global player
+                global voice
+                currentChannel = client.get_channel(message.author.voice_channel.id)
+                voice = await client.join_voice_channel(currentChannel)
+
+            elif message.author.voice_channel == None:
+                await client.send_message(message.channel, 'You are not in a voice channel.')
+
+            else:
+                await client.send_message(message.channel, 'I am already in a voice channel. Use !leave to make me leave.')
+
+        # Will leave the current voice channel
+        elif message.content.startswith('leave'):
+            if client.is_voice_connected(message.server):
+                currentChannel = client.voice_client_in(message.server)
+                await currentChannel.disconnect()
+		# Will play music using the following words as search parameters or use the
+        # linked video if a link is provided
+        elif message.content.startswith('play'):
+            if message.author.voice_channel != None:
+                if client.is_voice_connected(message.server) == True:
+                    try:
+                        if player.is_playing() == False:
+                            print('not playing')
+                            player = await voice.create_ytdl_player(youtubeLink.getYoutubeLink(message.content))
+                            player.start()
+                            await client.send_message(message.channel, ':musical_note: Currently Playing: ' + player.title)
+
+                        else:
+                            print('is playing')
+
+                    except NameError:
+                        print('name error')
+                        player = await voice.create_ytdl_player(youtubeLink.getYoutubeLink(message.content))
+                        player.start()
+                        await client.send_message(message.channel, ':musical_note: Currently Playing: ' + player.title)
+
+                else:
+                    await client.send_message(message.channel, 'I am not connected to a voice channel. Use !join to make me join')
+
+            else:
+                await client.send_message(message.channel, 'You are not connected to a voice channel. Enter a voice channel and use !join first.')
+
+        # Will pause the audio player
+        elif message.content.startswith('pause'):
+            try:
+                player.pause()
+
+            except NameError:
+                await client.send_message(message.channel, 'Not currently playing audio.')
+
+        # Will resume the audio player
+        elif message.content.startswith('resume'):
+            try:
+                player.resume()
+
+            except NameError:
+                await client.send_message(message.channel, 'Not currently playing audio.')
+
+        # Will stop the audio player
+        elif message.content.startswith('stop'):
+            try:
+                player.stop()
+
+            except NameError:
+                await client.send_message(message.channel, 'Not currently playing audio.')
+		# Help Message, sends a personal message with a list of all the commands
+        # and how to use them correctly
+        elif message.content.startswith('help'):
+            await client.send_message(message.channel, 'Sending you a PM!')
+            await client.send_message(message.author, helpMessage.helpMessage)
+
+
     if client.user.mention == message.author.mention:
         return
     if not (client.user.name.lower() in message.content.lower() or client.user.mention in message.content):
@@ -75,3 +179,4 @@ if __name__ == '__main__':
 		# Press ctrl-c or ctrl-d on the keyboard to exit
         except (KeyboardInterrupt, EOFError, SystemExit):
             break
+			

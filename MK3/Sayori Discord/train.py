@@ -3,7 +3,7 @@
 from chatterbot import ChatBot
 
 
-from chatterbot.trainers import ChatterBotCorpusTrainer
+from chatterbot.trainers import *
 
 chatterbot = ChatBot("Sayori")
 chatterbot.set_trainer(ChatterBotCorpusTrainer)
