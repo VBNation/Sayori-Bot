@@ -1,4 +1,6 @@
 # Sayori-Discord
+[![Documentation Status](https://readthedocs.org/projects/sayori-bot/badge/?version=latest)](https://sayori-bot.readthedocs.io/en/latest/?badge=latest)
+
 A Discord integration of our Sayori-Bot AGI
 ## Installation
 `pip install -r requirements.txt`
